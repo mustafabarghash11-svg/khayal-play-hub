@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSiteData } from "@/lib/khayal-store";
+import { useSiteData, safeHref } from "@/lib/khayal-store";
 import { KhayalLogo } from "@/components/KhayalLogo";
 import { SideNav } from "@/components/SideNav";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ function Home() {
           <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed">{data.tagline}</p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base px-8 shadow-[0_0_40px_oklch(0.65_0.18_215/0.5)]">
-              <a href={data.discordLink} target="_blank" rel="noreferrer">انضم للديسكورد</a>
+              <a href={safeHref(data.discordLink)} target="_blank" rel="noreferrer">انضم للديسكورد</a>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-accent/50 text-accent hover:bg-accent/10 font-bold text-base px-8">
               <Link to="/games">شوف الألعاب</Link>

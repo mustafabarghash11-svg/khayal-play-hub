@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSiteData } from "@/lib/khayal-store";
+import { useSiteData, safeHref } from "@/lib/khayal-store";
 import { SideNav } from "@/components/SideNav";
 
 export const Route = createFileRoute("/games")({
@@ -21,7 +21,7 @@ function GamesPage() {
           {data.games.map((g) => (
             <a
               key={g.id}
-              href={g.link}
+              href={safeHref(g.link)}
               target="_blank"
               rel="noreferrer"
               className="group relative rounded-2xl overflow-hidden bg-card border border-border hover:border-accent transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_60px_-10px_oklch(0.65_0.18_215/0.5)]"

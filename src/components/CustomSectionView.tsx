@@ -1,4 +1,4 @@
-import type { CustomSection } from "@/lib/khayal-store";
+import { type CustomSection, safeHref } from "@/lib/khayal-store";
 import { Button } from "@/components/ui/button";
 
 export function CustomSectionView({ section }: { section: CustomSection }) {
@@ -24,7 +24,7 @@ export function CustomSectionView({ section }: { section: CustomSection }) {
           if (b.type === "button") return (
             <div key={b.id} className="text-center">
               <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-8">
-                <a href={b.link} target="_blank" rel="noreferrer">{b.text}</a>
+                <a href={safeHref(b.link)} target="_blank" rel="noreferrer">{b.text}</a>
               </Button>
             </div>
           );
