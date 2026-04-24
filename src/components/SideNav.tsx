@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { useSiteData } from "@/lib/khayal-store";
+import { useSiteData, safeHref } from "@/lib/khayal-store";
 import { KhayalLogo } from "./KhayalLogo";
 
 export function SideNav() {
@@ -60,20 +60,13 @@ export function SideNav() {
           )}
 
           <a
-            href={data.discordLink}
+            href={safeHref(data.discordLink)}
             target="_blank"
             rel="noreferrer"
             className="block mt-4 px-4 py-3 rounded-lg bg-accent text-accent-foreground text-center font-bold hover:bg-accent/90"
           >
             انضم للديسكورد
           </a>
-          <Link
-            to="/devk"
-            onClick={() => setOpen(false)}
-            className="block px-4 py-3 mt-2 text-xs text-muted-foreground hover:text-accent text-center"
-          >
-            لوحة المطور
-          </Link>
         </nav>
       </aside>
     </>

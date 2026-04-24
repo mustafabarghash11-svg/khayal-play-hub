@@ -103,3 +103,17 @@ export function normalizeDigits(s: string) {
   return s.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
           .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
 }
+
+// Only allow http(s) URLs in user-controlled hrefs to prevent javascript: XSS.
+export function safeHref(url: string | undefined | null): string {
+  if (!url) return "#";
+  const trimmed = String(url).trim();
+  if (trimmed.startsWith("/") || trimmed.startsWith("#")) return trimmed;
+  try {
+    const u = new URL(trimmed, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+    if (u.protocol === "https:" || u.protocol === "http:" || u.protocol === "mailto:") return u.toString();
+  } catch {
+    // fall through
+  }
+  return "#";
+}

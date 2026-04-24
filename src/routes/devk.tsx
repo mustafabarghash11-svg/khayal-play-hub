@@ -25,7 +25,8 @@ function DevPanel() {
           onSubmit={(e) => {
             e.preventDefault();
             const cleaned = normalizeDigits(code).trim();
-            if (cleaned === "87") {
+            const expected = (import.meta.env.VITE_DEVK_PIN as string | undefined)?.trim() || "87";
+            if (cleaned && cleaned === expected) {
               setAuthed(true);
               toast.success("مرحباً بك");
             } else {
