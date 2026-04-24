@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useSiteData, defaultData, normalizeDigits, type Game, type Feature, type CustomSection, type Block } from "@/lib/khayal-store";
+import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block } from "@/lib/khayal-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -66,10 +66,15 @@ function Panel() {
   const deleteGame = (id: string) => update({ games: data.games.filter((g) => g.id !== id) });
   const addGame = () => update({ games: [...data.games, { id: Date.now().toString(), name: "لعبة جديدة", image: "https://placehold.co/600x800/0d3b3e/22d3ee?text=Game", link: "#", description: "وصف اللعبة" }] });
 
-  // Features
-  const updateFeature = (id: string, patch: Partial<Feature>) => update({ features: data.features.map((f) => f.id === id ? { ...f, ...patch } : f) });
-  const deleteFeature = (id: string) => update({ features: data.features.filter((f) => f.id !== id) });
-  const addFeature = () => update({ features: [...data.features, { id: Date.now().toString(), title: "ميزة جديدة", description: "وصف", icon: "✨" }] });
+  // Server stats
+  const updateStat = (id: string, patch: Partial<ServerStat>) => update({ serverStats: data.serverStats.map((s) => s.id === id ? { ...s, ...patch } : s) });
+  const deleteStat = (id: string) => update({ serverStats: data.serverStats.filter((s) => s.id !== id) });
+  const addStat = () => update({ serverStats: [...data.serverStats, { id: Date.now().toString(), label: "تسمية", value: "0", icon: "📊" }] });
+
+  // Server perks
+  const updatePerk = (id: string, patch: Partial<ServerPerk>) => update({ serverPerks: data.serverPerks.map((p) => p.id === id ? { ...p, ...patch } : p) });
+  const deletePerk = (id: string) => update({ serverPerks: data.serverPerks.filter((p) => p.id !== id) });
+  const addPerk = () => update({ serverPerks: [...data.serverPerks, { id: Date.now().toString(), title: "ميزة جديدة", description: "وصف", icon: "✨" }] });
 
   // Custom sections
   const addSection = () => {
@@ -150,15 +155,29 @@ function Panel() {
           ))}
         </Section>
 
-        {/* Features */}
-        <Section title={`المميزات (${data.features.length})`} action={<Button onClick={addFeature} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ميزة</Button>}>
-          {data.features.map((f) => (
-            <div key={f.id} className="border border-border rounded-xl p-4 grid grid-cols-[60px_1fr] gap-3 items-start">
-              <Input value={f.icon} onChange={(e) => updateFeature(f.id, { icon: e.target.value })} className="text-2xl text-center h-full" />
+        {/* Server stats */}
+        <Section title={`إحصائيات السيرفر (${data.serverStats.length})`} action={<Button onClick={addStat} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />إحصائية</Button>}>
+          {data.serverStats.map((s) => (
+            <div key={s.id} className="border border-border rounded-xl p-4 grid grid-cols-[60px_1fr] gap-3 items-start">
+              <Input value={s.icon} onChange={(e) => updateStat(s.id, { icon: e.target.value })} className="text-2xl text-center h-full" />
               <div className="space-y-2">
-                <Input placeholder="العنوان" value={f.title} onChange={(e) => updateFeature(f.id, { title: e.target.value })} />
-                <Input placeholder="الوصف" value={f.description} onChange={(e) => updateFeature(f.id, { description: e.target.value })} />
-                <Button variant="destructive" size="sm" onClick={() => deleteFeature(f.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+                <Input placeholder="القيمة (مثل 5,000+)" value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} />
+                <Input placeholder="التسمية (مثل عضو)" value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} />
+                <Button variant="destructive" size="sm" onClick={() => deleteStat(s.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+              </div>
+            </div>
+          ))}
+        </Section>
+
+        {/* Server perks */}
+        <Section title={`مميزات السيرفر (${data.serverPerks.length})`} action={<Button onClick={addPerk} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ميزة</Button>}>
+          {data.serverPerks.map((p) => (
+            <div key={p.id} className="border border-border rounded-xl p-4 grid grid-cols-[60px_1fr] gap-3 items-start">
+              <Input value={p.icon} onChange={(e) => updatePerk(p.id, { icon: e.target.value })} className="text-2xl text-center h-full" />
+              <div className="space-y-2">
+                <Input placeholder="العنوان" value={p.title} onChange={(e) => updatePerk(p.id, { title: e.target.value })} />
+                <Input placeholder="الوصف" value={p.description} onChange={(e) => updatePerk(p.id, { description: e.target.value })} />
+                <Button variant="destructive" size="sm" onClick={() => deletePerk(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
               </div>
             </div>
           ))}

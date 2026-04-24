@@ -32,12 +32,28 @@ export type CustomSection = {
   blocks: Block[];
 };
 
+export type ServerStat = {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+};
+
+export type ServerPerk = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+};
+
 export type SiteData = {
   siteName: string;
   tagline: string;
   discordLink: string;
   games: Game[];
   features: Feature[];
+  serverStats: ServerStat[];
+  serverPerks: ServerPerk[];
   customSections: CustomSection[];
 };
 
@@ -59,6 +75,18 @@ export const defaultData: SiteData = {
     { id: "f3", title: "مجتمع نشط", description: "آلاف اللاعبين العرب 24/7", icon: "🎮" },
     { id: "f4", title: "بث مباشر", description: "شاهد أفضل اللاعبين على الهواء", icon: "📡" },
   ],
+  serverStats: [
+    { id: "s1", label: "عضو", value: "5,000+", icon: "👥" },
+    { id: "s2", label: "متصل الآن", value: "850+", icon: "🟢" },
+    { id: "s3", label: "بطولة شهرياً", value: "12", icon: "🏆" },
+    { id: "s4", label: "قنوات", value: "40+", icon: "💬" },
+  ],
+  serverPerks: [
+    { id: "p1", title: "رتب وأدوار حصرية", description: "احصل على رتب مميزة حسب نشاطك ومستواك", icon: "⭐" },
+    { id: "p2", title: "بوتات متطورة", description: "موسيقى، ألعاب، ومستويات داخل السيرفر", icon: "🤖" },
+    { id: "p3", title: "إيفنتات أسبوعية", description: "أنشطة وجوائز كل أسبوع للأعضاء النشطين", icon: "🎉" },
+    { id: "p4", title: "دعم 24/7", description: "فريق إدارة متواجد على مدار الساعة", icon: "🛡️" },
+  ],
   customSections: [],
 };
 
@@ -72,6 +100,8 @@ export function loadData(): SiteData {
       ...defaultData,
       ...parsed,
       customSections: parsed.customSections ?? [],
+      serverStats: parsed.serverStats ?? defaultData.serverStats,
+      serverPerks: parsed.serverPerks ?? defaultData.serverPerks,
     };
   } catch {
     return defaultData;

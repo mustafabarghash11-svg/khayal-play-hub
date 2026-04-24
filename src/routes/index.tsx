@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useSiteData, safeHref } from "@/lib/khayal-store";
 import { KhayalLogo } from "@/components/KhayalLogo";
 import { SideNav } from "@/components/SideNav";
@@ -43,45 +43,63 @@ function Home() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed">{data.tagline}</p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex justify-center">
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base px-8 shadow-[0_0_40px_oklch(0.65_0.18_215/0.5)]">
               <a href={safeHref(data.discordLink)} target="_blank" rel="noreferrer">انضم للديسكورد</a>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-accent/50 text-accent hover:bg-accent/10 font-bold text-base px-8">
-              <Link to="/games">شوف الألعاب</Link>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Quick links to pages */}
-      <section className="py-20 px-6 max-w-5xl mx-auto">
-        <div className="grid sm:grid-cols-2 gap-6">
-          <PageCard to="/games" label="الألعاب" desc="استعرض جميع الألعاب المتاحة" />
-          <PageCard to="/features" label="المميزات" desc="اكتشف ما يميز مجتمعنا" />
-          {data.customSections.map((s) => (
-            <Link key={s.id} to="/s/$slug" params={{ slug: s.slug }} className="group block p-8 rounded-2xl bg-card border border-border hover:border-accent transition-all hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_oklch(0.65_0.18_215/0.4)]">
-              <p className="text-accent text-xs font-bold tracking-widest mb-2">// SECTION</p>
-              <h3 className="text-2xl font-black mb-1 group-hover:text-accent transition-colors">{s.title}</h3>
-              <p className="text-sm text-muted-foreground">اضغط لعرض القسم</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Server stats */}
+      {data.serverStats.length > 0 && (
+        <section className="py-20 px-6 max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-accent font-bold tracking-widest text-sm mb-3">// STATS</p>
+            <h2 className="text-3xl md:text-5xl font-black">إحصائيات السيرفر</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {data.serverStats.map((s) => (
+              <div
+                key={s.id}
+                className="rounded-2xl bg-card border border-border p-6 text-center hover:border-accent transition-all hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_oklch(0.65_0.18_215/0.4)]"
+              >
+                <div className="text-4xl mb-3">{s.icon}</div>
+                <div className="text-3xl md:text-4xl font-black text-accent mb-1">{s.value}</div>
+                <div className="text-sm text-muted-foreground">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Server perks */}
+      {data.serverPerks.length > 0 && (
+        <section className="py-20 px-6 max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-accent font-bold tracking-widest text-sm mb-3">// PERKS</p>
+            <h2 className="text-3xl md:text-5xl font-black">مميزات السيرفر</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {data.serverPerks.map((p) => (
+              <div
+                key={p.id}
+                className="rounded-2xl bg-card border border-border p-6 flex gap-4 items-start hover:border-accent transition-all"
+              >
+                <div className="text-4xl shrink-0">{p.icon}</div>
+                <div>
+                  <h3 className="text-xl font-black mb-1">{p.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <footer className="border-t border-border py-8 px-6 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} {data.siteName}
       </footer>
     </div>
-  );
-}
-
-function PageCard({ to, label, desc }: { to: "/games" | "/features"; label: string; desc: string }) {
-  return (
-    <Link to={to} className="group block p-8 rounded-2xl bg-card border border-border hover:border-accent transition-all hover:-translate-y-1 hover:shadow-[0_20px_50px_-15px_oklch(0.65_0.18_215/0.4)]">
-      <p className="text-accent text-xs font-bold tracking-widest mb-2">// PAGE</p>
-      <h3 className="text-2xl font-black mb-1 group-hover:text-accent transition-colors">{label}</h3>
-      <p className="text-sm text-muted-foreground">{desc}</p>
-    </Link>
   );
 }
