@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GamesRouteImport } from './routes/games'
-import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DevkRouteImport } from './routes/devk'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
@@ -18,11 +17,6 @@ import { Route as SSlugRouteImport } from './routes/s.$slug'
 const GamesRoute = GamesRouteImport.update({
   id: '/games',
   path: '/games',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeaturesRoute = FeaturesRouteImport.update({
-  id: '/features',
-  path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevkRoute = DevkRouteImport.update({
@@ -44,14 +38,12 @@ const SSlugRoute = SSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
-  '/features': typeof FeaturesRoute
   '/games': typeof GamesRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
-  '/features': typeof FeaturesRoute
   '/games': typeof GamesRoute
   '/s/$slug': typeof SSlugRoute
 }
@@ -59,22 +51,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
-  '/features': typeof FeaturesRoute
   '/games': typeof GamesRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/devk' | '/features' | '/games' | '/s/$slug'
+  fullPaths: '/' | '/devk' | '/games' | '/s/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/devk' | '/features' | '/games' | '/s/$slug'
-  id: '__root__' | '/' | '/devk' | '/features' | '/games' | '/s/$slug'
+  to: '/' | '/devk' | '/games' | '/s/$slug'
+  id: '__root__' | '/' | '/devk' | '/games' | '/s/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevkRoute: typeof DevkRoute
-  FeaturesRoute: typeof FeaturesRoute
   GamesRoute: typeof GamesRoute
   SSlugRoute: typeof SSlugRoute
 }
@@ -86,13 +76,6 @@ declare module '@tanstack/react-router' {
       path: '/games'
       fullPath: '/games'
       preLoaderRoute: typeof GamesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/features': {
-      id: '/features'
-      path: '/features'
-      fullPath: '/features'
-      preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/devk': {
@@ -122,7 +105,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevkRoute: DevkRoute,
-  FeaturesRoute: FeaturesRoute,
   GamesRoute: GamesRoute,
   SSlugRoute: SSlugRoute,
 }
