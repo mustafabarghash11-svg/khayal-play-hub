@@ -9,9 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as GamesRouteImport } from './routes/games'
+import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DevkRouteImport } from './routes/devk'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SSlugRouteImport } from './routes/s.$slug'
 
+const GamesRoute = GamesRouteImport.update({
+  id: '/games',
+  path: '/games',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevkRoute = DevkRouteImport.update({
   id: '/devk',
   path: '/devk',
@@ -22,35 +35,66 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
+  '/features': typeof FeaturesRoute
+  '/games': typeof GamesRoute
+  '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
+  '/features': typeof FeaturesRoute
+  '/games': typeof GamesRoute
+  '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
+  '/features': typeof FeaturesRoute
+  '/games': typeof GamesRoute
+  '/s/$slug': typeof SSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/devk'
+  fullPaths: '/' | '/devk' | '/features' | '/games' | '/s/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/devk'
-  id: '__root__' | '/' | '/devk'
+  to: '/' | '/devk' | '/features' | '/games' | '/s/$slug'
+  id: '__root__' | '/' | '/devk' | '/features' | '/games' | '/s/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevkRoute: typeof DevkRoute
+  FeaturesRoute: typeof FeaturesRoute
+  GamesRoute: typeof GamesRoute
+  SSlugRoute: typeof SSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/devk': {
       id: '/devk'
       path: '/devk'
@@ -65,12 +109,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$slug': {
+      id: '/s/$slug'
+      path: '/s/$slug'
+      fullPath: '/s/$slug'
+      preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevkRoute: DevkRoute,
+  FeaturesRoute: FeaturesRoute,
+  GamesRoute: GamesRoute,
+  SSlugRoute: SSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

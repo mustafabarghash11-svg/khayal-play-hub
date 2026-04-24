@@ -8,13 +8,6 @@ export function SideNav() {
   const [open, setOpen] = useState(false);
   const [data] = useSiteData();
 
-  const links = [
-    { label: "الصفحة الرئيسية", href: "/#home" },
-    { label: "الألعاب", href: "/#games" },
-    { label: "المميزات", href: "/#features" },
-    ...data.customSections.map((s) => ({ label: s.title, href: `/#${s.slug}` })),
-  ];
-
   return (
     <>
       <button
@@ -25,16 +18,14 @@ export function SideNav() {
         <Menu className="w-6 h-6 text-accent" />
       </button>
 
-      {/* Overlay */}
       <div
         onClick={() => setOpen(false)}
         className={`fixed inset-0 z-40 bg-background/70 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       />
 
-      {/* Drawer */}
       <aside
         dir="rtl"
-        className={`fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-card border-l border-border shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-card border-l border-border shadow-2xl transition-transform duration-300 overflow-y-auto ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="flex items-center justify-between p-5 border-b border-border">
           <div className="flex items-center gap-3">
@@ -47,16 +38,27 @@ export function SideNav() {
         </div>
 
         <nav className="p-5 space-y-1">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 rounded-lg text-base hover:bg-accent/10 hover:text-accent transition-colors"
-            >
-              {l.label}
-            </a>
-          ))}
+          <NavLink to="/" onClick={() => setOpen(false)}>الصفحة الرئيسية</NavLink>
+          <NavLink to="/games" onClick={() => setOpen(false)}>الألعاب</NavLink>
+          <NavLink to="/features" onClick={() => setOpen(false)}>المميزات</NavLink>
+
+          {data.customSections.length > 0 && (
+            <div className="pt-3 mt-3 border-t border-border">
+              <p className="px-4 pb-2 text-xs text-muted-foreground tracking-widest">// أقسام</p>
+              {data.customSections.map((s) => (
+                <Link
+                  key={s.id}
+                  to="/s/$slug"
+                  params={{ slug: s.slug }}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-3 rounded-lg text-base hover:bg-accent/10 hover:text-accent transition-colors"
+                >
+                  {s.title}
+                </Link>
+              ))}
+            </div>
+          )}
+
           <a
             href={data.discordLink}
             target="_blank"
@@ -75,5 +77,19 @@ export function SideNav() {
         </nav>
       </aside>
     </>
+  );
+}
+
+function NavLink({ to, onClick, children }: { to: "/" | "/games" | "/features"; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      activeOptions={{ exact: true }}
+      activeProps={{ className: "block px-4 py-3 rounded-lg text-base bg-accent/15 text-accent font-bold transition-colors" }}
+      inactiveProps={{ className: "block px-4 py-3 rounded-lg text-base hover:bg-accent/10 hover:text-accent transition-colors" }}
+    >
+      {children}
+    </Link>
   );
 }
