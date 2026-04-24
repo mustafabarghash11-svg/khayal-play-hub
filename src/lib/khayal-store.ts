@@ -16,7 +16,20 @@ export type Feature = {
   id: string;
   title: string;
   description: string;
-  icon: string; // emoji
+  icon: string;
+};
+
+export type Block =
+  | { id: string; type: "heading"; text: string }
+  | { id: string; type: "text"; text: string }
+  | { id: string; type: "image"; src: string; alt: string }
+  | { id: string; type: "button"; text: string; link: string };
+
+export type CustomSection = {
+  id: string;
+  slug: string; // used in nav
+  title: string;
+  blocks: Block[];
 };
 
 export type SiteData = {
@@ -25,9 +38,10 @@ export type SiteData = {
   discordLink: string;
   games: Game[];
   features: Feature[];
+  customSections: CustomSection[];
 };
 
-const STORAGE_KEY = "khayal-site-data-v1";
+const STORAGE_KEY = "khayal-site-data-v2";
 
 export const defaultData: SiteData = {
   siteName: "Khayal Community",
@@ -45,6 +59,7 @@ export const defaultData: SiteData = {
     { id: "f3", title: "مجتمع نشط", description: "آلاف اللاعبين العرب 24/7", icon: "🎮" },
     { id: "f4", title: "بث مباشر", description: "شاهد أفضل اللاعبين على الهواء", icon: "📡" },
   ],
+  customSections: [],
 };
 
 export function loadData(): SiteData {
@@ -52,7 +67,12 @@ export function loadData(): SiteData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData;
-    return { ...defaultData, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return {
+      ...defaultData,
+      ...parsed,
+      customSections: parsed.customSections ?? [],
+    };
   } catch {
     return defaultData;
   }
@@ -76,4 +96,10 @@ export function useSiteData() {
     };
   }, []);
   return [data, (d: SiteData) => { saveData(d); setData(d); }] as const;
+}
+
+// Convert Arabic-Indic digits to ASCII
+export function normalizeDigits(s: string) {
+  return s.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+          .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
 }
