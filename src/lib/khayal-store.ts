@@ -100,6 +100,8 @@ export function loadData(): SiteData {
       ...defaultData,
       ...parsed,
       customSections: parsed.customSections ?? [],
+      serverStats: parsed.serverStats ?? defaultData.serverStats,
+      serverPerks: parsed.serverPerks ?? defaultData.serverPerks,
     };
   } catch {
     return defaultData;
