@@ -25,15 +25,11 @@ function Home() {
       <header
         className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20"
         style={{
-          backgroundImage: `linear-gradient(180deg, oklch(0.10 0.03 200 / 0.7), oklch(0.18 0.04 200 / 0.85)), url(${heroBg})`,
+          backgroundImage: `linear-gradient(180deg, oklch(0.14 0.04 200 / 0.75), oklch(0.18 0.04 200 / 0.9)), url(${heroBg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="pointer-events-none absolute inset-0 opacity-30">
-          <div className="absolute top-10 left-10 text-7xl text-accent rotate-[-15deg] font-black">⚡</div>
-          <div className="absolute bottom-20 right-10 text-7xl text-accent rotate-[20deg] font-black">⚡</div>
-        </div>
 
         <div className="relative z-10 text-center max-w-3xl">
           <KhayalLogo className="h-32 w-32 mx-auto mb-8 animate-[pulse_3s_ease-in-out_infinite]" />
