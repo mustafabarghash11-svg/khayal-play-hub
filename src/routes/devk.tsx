@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block } from "@/lib/khayal-store";
+import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block, type Streamer, type LeaderboardEntry, type HallOfFameEntry } from "@/lib/khayal-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/devk")({
