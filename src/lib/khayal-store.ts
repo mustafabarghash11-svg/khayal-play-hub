@@ -97,16 +97,6 @@ export type SiteData = {
 };
 
 export type SiteData = {
-  siteName: string;
-  tagline: string;
-  discordLink: string;
-  games: Game[];
-  features: Feature[];
-  serverStats: ServerStat[];
-  serverPerks: ServerPerk[];
-  customSections: CustomSection[];
-};
-
 const STORAGE_KEY = "khayal-site-data-v2";
 
 export const defaultData: SiteData = {
