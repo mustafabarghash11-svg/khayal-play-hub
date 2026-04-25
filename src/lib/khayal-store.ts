@@ -151,20 +151,6 @@ export function loadData(): SiteData {
       leaderboard: parsed.leaderboard ?? [],
       hallOfFame: parsed.hallOfFame ?? [],
     };
-
-export function loadData(): SiteData {
-  if (typeof window === "undefined") return defaultData;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultData;
-    const parsed = JSON.parse(raw);
-    return {
-      ...defaultData,
-      ...parsed,
-      customSections: parsed.customSections ?? [],
-      serverStats: parsed.serverStats ?? defaultData.serverStats,
-      serverPerks: parsed.serverPerks ?? defaultData.serverPerks,
-    };
   } catch {
     return defaultData;
   }
