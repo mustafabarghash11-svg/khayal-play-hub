@@ -154,6 +154,13 @@ function Panel() {
           <Field label="اسم الموقع"><Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} /></Field>
           <Field label="الوصف"><Textarea value={data.tagline} onChange={(e) => update({ tagline: e.target.value })} /></Field>
           <Field label="رابط الديسكورد"><Input value={data.discordLink} onChange={(e) => update({ discordLink: e.target.value })} /></Field>
+          <Field label="Discord Server ID (لعرض عدد المتصلين مباشرة — فعّل Widget من إعدادات السيرفر)">
+            <Input value={data.discordServerId} onChange={(e) => update({ discordServerId: e.target.value })} placeholder="123456789012345678" />
+          </Field>
+          <div className="flex items-center justify-between rounded-lg border border-border p-3">
+            <Label>عرض عداد الزوار في الصفحة الرئيسية</Label>
+            <Switch checked={data.showVisitorCounter} onCheckedChange={(v) => update({ showVisitorCounter: v })} />
+          </div>
         </Section>
 
         {/* Games */}
