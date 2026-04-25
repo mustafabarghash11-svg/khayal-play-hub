@@ -206,6 +206,78 @@ function Panel() {
           ))}
         </Section>
 
+        {/* Streamers */}
+        <Section title={`الستريمرز / المبدعون (${data.streamers.length})`} action={<Button onClick={addStreamer} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ستريمر</Button>}>
+          {data.streamers.map((s) => (
+            <div key={s.id} className="border border-border rounded-xl p-4 space-y-3">
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input placeholder="الاسم" value={s.name} onChange={(e) => updateStreamer(s.id, { name: e.target.value })} />
+                <Input placeholder="المنصة (Twitch, YouTube, Kick, TikTok...)" value={s.platform} onChange={(e) => updateStreamer(s.id, { platform: e.target.value })} />
+              </div>
+              <Input placeholder="رابط القناة" value={s.link} onChange={(e) => updateStreamer(s.id, { link: e.target.value })} />
+              <ImageUpload value={s.image} onChange={(v) => updateStreamer(s.id, { image: v })} placeholder="صورة الستريمر" />
+              <div className="flex items-center justify-between rounded-lg bg-background/40 p-3">
+                <Label className="flex items-center gap-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${s.isLive ? "bg-red-500 animate-pulse" : "bg-muted-foreground"}`} />
+                  {s.isLive ? "حالياً LIVE 🔴" : "غير متصل"}
+                </Label>
+                <Switch checked={s.isLive} onCheckedChange={(v) => updateStreamer(s.id, { isLive: v })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteStreamer(s.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            </div>
+          ))}
+        </Section>
+
+        {/* Upcoming event */}
+        <Section title="الإيفنت القادم (Countdown)" action={
+          data.upcomingEvent
+            ? <Button variant="destructive" size="sm" onClick={() => update({ upcomingEvent: null })}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            : <Button size="sm" className="bg-accent text-accent-foreground" onClick={() => update({ upcomingEvent: { id: Date.now().toString(), title: "بطولة جديدة", description: "وصف الإيفنت", date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16) } })}><Plus className="w-4 h-4 ml-1" />إضافة</Button>
+        }>
+          {data.upcomingEvent ? (
+            <div className="space-y-3">
+              <Field label="عنوان الإيفنت"><Input value={data.upcomingEvent.title} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, title: e.target.value } })} /></Field>
+              <Field label="الوصف"><Textarea value={data.upcomingEvent.description} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, description: e.target.value } })} /></Field>
+              <Field label="التاريخ والوقت">
+                <Input type="datetime-local" value={data.upcomingEvent.date.slice(0, 16)} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, date: new Date(e.target.value).toISOString() } })} />
+              </Field>
+            </div>
+          ) : <p className="text-sm text-muted-foreground text-center py-2">لا يوجد إيفنت حالياً</p>}
+        </Section>
+
+        {/* Leaderboard */}
+        <Section title={`أفضل اللاعبين (${data.leaderboard.length})`} action={<Button onClick={addLeader} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />لاعب</Button>}>
+          {data.leaderboard.map((p) => (
+            <div key={p.id} className="border border-border rounded-xl p-4 space-y-3">
+              <div className="grid grid-cols-[80px_1fr] gap-2">
+                <Input type="number" placeholder="الترتيب" value={p.rank} onChange={(e) => updateLeader(p.id, { rank: Number(e.target.value) || 1 })} />
+                <Input placeholder="اسم اللاعب" value={p.name} onChange={(e) => updateLeader(p.id, { name: e.target.value })} />
+              </div>
+              <ImageUpload value={p.image} onChange={(v) => updateLeader(p.id, { image: v })} placeholder="صورة اللاعب" />
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input type="number" placeholder="النقاط" value={p.points} onChange={(e) => updateLeader(p.id, { points: Number(e.target.value) || 0 })} />
+                <Input placeholder="الشارة (مثل: محترف)" value={p.badge} onChange={(e) => updateLeader(p.id, { badge: e.target.value })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteLeader(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            </div>
+          ))}
+        </Section>
+
+        {/* Hall of Fame */}
+        <Section title={`قاعة الأبطال (${data.hallOfFame.length})`} action={<Button onClick={addHof} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />بطل</Button>}>
+          {data.hallOfFame.map((c) => (
+            <div key={c.id} className="border border-border rounded-xl p-4 space-y-3">
+              <Input placeholder="اسم البطل" value={c.championName} onChange={(e) => updateHof(c.id, { championName: e.target.value })} />
+              <ImageUpload value={c.image} onChange={(v) => updateHof(c.id, { image: v })} placeholder="صورة البطل" />
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input placeholder="اسم البطولة" value={c.tournament} onChange={(e) => updateHof(c.id, { tournament: e.target.value })} />
+                <Input placeholder="السنة" value={c.year} onChange={(e) => updateHof(c.id, { year: e.target.value })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteHof(c.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            </div>
+          ))}
+        </Section>
+
         {/* Custom sections */}
         <Section title={`أقسام مخصصة (${data.customSections.length})`} action={<Button onClick={addSection} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />قسم</Button>}>
           {data.customSections.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">لا توجد أقسام بعد. أضف واحداً وابدأ بإضافة نصوص، صور، وأزرار.</p>}
