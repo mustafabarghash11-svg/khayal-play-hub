@@ -46,23 +46,64 @@ export type ServerPerk = {
   icon: string;
 };
 
+export type Streamer = {
+  id: string;
+  name: string;
+  image: string;
+  platform: string; // Twitch, YouTube, Kick, TikTok...
+  link: string;
+  isLive: boolean;
+};
+
+export type UpcomingEvent = {
+  id: string;
+  title: string;
+  description: string;
+  date: string; // ISO datetime
+};
+
+export type LeaderboardEntry = {
+  id: string;
+  rank: number;
+  name: string;
+  image: string;
+  points: number;
+  badge: string;
+};
+
+export type HallOfFameEntry = {
+  id: string;
+  championName: string;
+  image: string;
+  tournament: string;
+  year: string;
+};
+
 export type SiteData = {
   siteName: string;
   tagline: string;
   discordLink: string;
+  discordServerId: string; // for live member count widget
+  showVisitorCounter: boolean;
   games: Game[];
   features: Feature[];
   serverStats: ServerStat[];
   serverPerks: ServerPerk[];
+  streamers: Streamer[];
+  upcomingEvent: UpcomingEvent | null;
+  leaderboard: LeaderboardEntry[];
+  hallOfFame: HallOfFameEntry[];
   customSections: CustomSection[];
 };
 
-const STORAGE_KEY = "khayal-site-data-v2";
+const STORAGE_KEY = "khayal-site-data-v3";
 
 export const defaultData: SiteData = {
   siteName: "Khayal Community",
   tagline: "مجتمع الخيال للألعاب — حيث يلتقي اللاعبون الحقيقيون",
   discordLink: "https://discord.gg/khayal",
+  discordServerId: "",
+  showVisitorCounter: true,
   games: [
     { id: "1", name: "Fortnite", image: game1, link: "#", description: "باتل رويال أسطوري" },
     { id: "2", name: "Minecraft", image: game2, link: "#", description: "عالم لا حدود له" },
@@ -77,7 +118,6 @@ export const defaultData: SiteData = {
   ],
   serverStats: [
     { id: "s1", label: "عضو", value: "5,000+", icon: "👥" },
-    { id: "s2", label: "متصل الآن", value: "850+", icon: "🟢" },
     { id: "s3", label: "بطولة شهرياً", value: "12", icon: "🏆" },
     { id: "s4", label: "قنوات", value: "40+", icon: "💬" },
   ],
@@ -87,6 +127,10 @@ export const defaultData: SiteData = {
     { id: "p3", title: "إيفنتات أسبوعية", description: "أنشطة وجوائز كل أسبوع للأعضاء النشطين", icon: "🎉" },
     { id: "p4", title: "دعم 24/7", description: "فريق إدارة متواجد على مدار الساعة", icon: "🛡️" },
   ],
+  streamers: [],
+  upcomingEvent: null,
+  leaderboard: [],
+  hallOfFame: [],
   customSections: [],
 };
 
@@ -102,6 +146,10 @@ export function loadData(): SiteData {
       customSections: parsed.customSections ?? [],
       serverStats: parsed.serverStats ?? defaultData.serverStats,
       serverPerks: parsed.serverPerks ?? defaultData.serverPerks,
+      streamers: parsed.streamers ?? [],
+      upcomingEvent: parsed.upcomingEvent ?? null,
+      leaderboard: parsed.leaderboard ?? [],
+      hallOfFame: parsed.hallOfFame ?? [],
     };
   } catch {
     return defaultData;

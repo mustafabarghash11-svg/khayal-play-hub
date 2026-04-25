@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block } from "@/lib/khayal-store";
+import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block, type Streamer, type LeaderboardEntry, type HallOfFameEntry } from "@/lib/khayal-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/devk")({
@@ -76,6 +77,21 @@ function Panel() {
   const deletePerk = (id: string) => update({ serverPerks: data.serverPerks.filter((p) => p.id !== id) });
   const addPerk = () => update({ serverPerks: [...data.serverPerks, { id: Date.now().toString(), title: "ميزة جديدة", description: "وصف", icon: "✨" }] });
 
+  // Streamers
+  const updateStreamer = (id: string, patch: Partial<Streamer>) => update({ streamers: data.streamers.map((s) => s.id === id ? { ...s, ...patch } : s) });
+  const deleteStreamer = (id: string) => update({ streamers: data.streamers.filter((s) => s.id !== id) });
+  const addStreamer = () => update({ streamers: [...data.streamers, { id: Date.now().toString(), name: "اسم الستريمر", image: "", platform: "Twitch", link: "https://", isLive: false }] });
+
+  // Leaderboard
+  const updateLeader = (id: string, patch: Partial<LeaderboardEntry>) => update({ leaderboard: data.leaderboard.map((p) => p.id === id ? { ...p, ...patch } : p) });
+  const deleteLeader = (id: string) => update({ leaderboard: data.leaderboard.filter((p) => p.id !== id) });
+  const addLeader = () => update({ leaderboard: [...data.leaderboard, { id: Date.now().toString(), rank: data.leaderboard.length + 1, name: "اسم اللاعب", image: "", points: 0, badge: "" }] });
+
+  // Hall of Fame
+  const updateHof = (id: string, patch: Partial<HallOfFameEntry>) => update({ hallOfFame: data.hallOfFame.map((c) => c.id === id ? { ...c, ...patch } : c) });
+  const deleteHof = (id: string) => update({ hallOfFame: data.hallOfFame.filter((c) => c.id !== id) });
+  const addHof = () => update({ hallOfFame: [...data.hallOfFame, { id: Date.now().toString(), championName: "اسم البطل", image: "", tournament: "اسم البطولة", year: new Date().getFullYear().toString() }] });
+
   // Custom sections
   const addSection = () => {
     const id = Date.now().toString();
@@ -138,6 +154,13 @@ function Panel() {
           <Field label="اسم الموقع"><Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} /></Field>
           <Field label="الوصف"><Textarea value={data.tagline} onChange={(e) => update({ tagline: e.target.value })} /></Field>
           <Field label="رابط الديسكورد"><Input value={data.discordLink} onChange={(e) => update({ discordLink: e.target.value })} /></Field>
+          <Field label="Discord Server ID (لعرض عدد المتصلين مباشرة — فعّل Widget من إعدادات السيرفر)">
+            <Input value={data.discordServerId} onChange={(e) => update({ discordServerId: e.target.value })} placeholder="123456789012345678" />
+          </Field>
+          <div className="flex items-center justify-between rounded-lg border border-border p-3">
+            <Label>عرض عداد الزوار في الصفحة الرئيسية</Label>
+            <Switch checked={data.showVisitorCounter} onCheckedChange={(v) => update({ showVisitorCounter: v })} />
+          </div>
         </Section>
 
         {/* Games */}
@@ -179,6 +202,78 @@ function Panel() {
                 <Input placeholder="الوصف" value={p.description} onChange={(e) => updatePerk(p.id, { description: e.target.value })} />
                 <Button variant="destructive" size="sm" onClick={() => deletePerk(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
               </div>
+            </div>
+          ))}
+        </Section>
+
+        {/* Streamers */}
+        <Section title={`الستريمرز / المبدعون (${data.streamers.length})`} action={<Button onClick={addStreamer} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ستريمر</Button>}>
+          {data.streamers.map((s) => (
+            <div key={s.id} className="border border-border rounded-xl p-4 space-y-3">
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input placeholder="الاسم" value={s.name} onChange={(e) => updateStreamer(s.id, { name: e.target.value })} />
+                <Input placeholder="المنصة (Twitch, YouTube, Kick, TikTok...)" value={s.platform} onChange={(e) => updateStreamer(s.id, { platform: e.target.value })} />
+              </div>
+              <Input placeholder="رابط القناة" value={s.link} onChange={(e) => updateStreamer(s.id, { link: e.target.value })} />
+              <ImageUpload value={s.image} onChange={(v) => updateStreamer(s.id, { image: v })} placeholder="صورة الستريمر" />
+              <div className="flex items-center justify-between rounded-lg bg-background/40 p-3">
+                <Label className="flex items-center gap-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${s.isLive ? "bg-red-500 animate-pulse" : "bg-muted-foreground"}`} />
+                  {s.isLive ? "حالياً LIVE 🔴" : "غير متصل"}
+                </Label>
+                <Switch checked={s.isLive} onCheckedChange={(v) => updateStreamer(s.id, { isLive: v })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteStreamer(s.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            </div>
+          ))}
+        </Section>
+
+        {/* Upcoming event */}
+        <Section title="الإيفنت القادم (Countdown)" action={
+          data.upcomingEvent
+            ? <Button variant="destructive" size="sm" onClick={() => update({ upcomingEvent: null })}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            : <Button size="sm" className="bg-accent text-accent-foreground" onClick={() => update({ upcomingEvent: { id: Date.now().toString(), title: "بطولة جديدة", description: "وصف الإيفنت", date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16) } })}><Plus className="w-4 h-4 ml-1" />إضافة</Button>
+        }>
+          {data.upcomingEvent ? (
+            <div className="space-y-3">
+              <Field label="عنوان الإيفنت"><Input value={data.upcomingEvent.title} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, title: e.target.value } })} /></Field>
+              <Field label="الوصف"><Textarea value={data.upcomingEvent.description} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, description: e.target.value } })} /></Field>
+              <Field label="التاريخ والوقت">
+                <Input type="datetime-local" value={data.upcomingEvent.date.slice(0, 16)} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, date: new Date(e.target.value).toISOString() } })} />
+              </Field>
+            </div>
+          ) : <p className="text-sm text-muted-foreground text-center py-2">لا يوجد إيفنت حالياً</p>}
+        </Section>
+
+        {/* Leaderboard */}
+        <Section title={`أفضل اللاعبين (${data.leaderboard.length})`} action={<Button onClick={addLeader} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />لاعب</Button>}>
+          {data.leaderboard.map((p) => (
+            <div key={p.id} className="border border-border rounded-xl p-4 space-y-3">
+              <div className="grid grid-cols-[80px_1fr] gap-2">
+                <Input type="number" placeholder="الترتيب" value={p.rank} onChange={(e) => updateLeader(p.id, { rank: Number(e.target.value) || 1 })} />
+                <Input placeholder="اسم اللاعب" value={p.name} onChange={(e) => updateLeader(p.id, { name: e.target.value })} />
+              </div>
+              <ImageUpload value={p.image} onChange={(v) => updateLeader(p.id, { image: v })} placeholder="صورة اللاعب" />
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input type="number" placeholder="النقاط" value={p.points} onChange={(e) => updateLeader(p.id, { points: Number(e.target.value) || 0 })} />
+                <Input placeholder="الشارة (مثل: محترف)" value={p.badge} onChange={(e) => updateLeader(p.id, { badge: e.target.value })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteLeader(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
+            </div>
+          ))}
+        </Section>
+
+        {/* Hall of Fame */}
+        <Section title={`قاعة الأبطال (${data.hallOfFame.length})`} action={<Button onClick={addHof} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />بطل</Button>}>
+          {data.hallOfFame.map((c) => (
+            <div key={c.id} className="border border-border rounded-xl p-4 space-y-3">
+              <Input placeholder="اسم البطل" value={c.championName} onChange={(e) => updateHof(c.id, { championName: e.target.value })} />
+              <ImageUpload value={c.image} onChange={(v) => updateHof(c.id, { image: v })} placeholder="صورة البطل" />
+              <div className="grid sm:grid-cols-2 gap-2">
+                <Input placeholder="اسم البطولة" value={c.tournament} onChange={(e) => updateHof(c.id, { tournament: e.target.value })} />
+                <Input placeholder="السنة" value={c.year} onChange={(e) => updateHof(c.id, { year: e.target.value })} />
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => deleteHof(c.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
             </div>
           ))}
         </Section>
