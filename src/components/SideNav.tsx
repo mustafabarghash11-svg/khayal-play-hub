@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User as UserIcon, Shield } from "lucide-react";
 import { useSiteData, safeHref } from "@/lib/khayal-store";
+import { useAuth } from "@/hooks/useAuth";
 import { KhayalLogo } from "./KhayalLogo";
 
 export function SideNav() {
   const [open, setOpen] = useState(false);
   const [data] = useSiteData();
+  const { user, profile, isAdmin } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <>
@@ -37,12 +41,49 @@ export function SideNav() {
           </button>
         </div>
 
+        {mounted && user && profile && (
+          <Link
+            to="/account"
+            onClick={() => setOpen(false)}
+            className="block mx-5 mt-5 p-3 rounded-xl bg-gradient-to-l from-accent/15 to-transparent border border-accent/30 hover:border-accent transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full overflow-hidden bg-muted shrink-0">
+                {profile.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> :
+                  <div className="w-full h-full flex items-center justify-center"><UserIcon className="w-5 h-5" /></div>}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-bold text-sm truncate">{profile.display_name}</div>
+                <div className="text-xs text-accent">Lv {profile.level} · {profile.points} نقطة</div>
+              </div>
+            </div>
+          </Link>
+        )}
+
         <nav className="p-5 space-y-1">
           <NavLink to="/" onClick={() => setOpen(false)}>الصفحة الرئيسية</NavLink>
           <NavLink to="/games" onClick={() => setOpen(false)}>الألعاب</NavLink>
+          <NavLink to="/tournaments" onClick={() => setOpen(false)}>البطولات</NavLink>
+          <NavLink to="/shop" onClick={() => setOpen(false)}>متجر النقاط</NavLink>
           <NavLink to="/streamers" onClick={() => setOpen(false)}>المبدعون</NavLink>
           <NavLink to="/leaderboard" onClick={() => setOpen(false)}>أفضل اللاعبين</NavLink>
           <NavLink to="/hall-of-fame" onClick={() => setOpen(false)}>قاعة الأبطال</NavLink>
+
+          {mounted && !user && (
+            <NavLink to="/auth" onClick={() => setOpen(false)}>تسجيل الدخول</NavLink>
+          )}
+          {mounted && user && (
+            <NavLink to="/account" onClick={() => setOpen(false)}>حسابي</NavLink>
+          )}
+          {mounted && isAdmin && (
+            <Link
+              to="/devk"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 rounded-lg text-base text-yellow-500 hover:bg-yellow-500/10 transition-colors"
+            >
+              <Shield className="w-4 h-4" /> لوحة الإدارة
+            </Link>
+          )}
 
           {data.customSections.length > 0 && (
             <div className="pt-3 mt-3 border-t border-border">
@@ -75,7 +116,9 @@ export function SideNav() {
   );
 }
 
-function NavLink({ to, onClick, children }: { to: "/" | "/games" | "/streamers" | "/leaderboard" | "/hall-of-fame"; onClick: () => void; children: React.ReactNode }) {
+type NavTo = "/" | "/games" | "/tournaments" | "/shop" | "/streamers" | "/leaderboard" | "/hall-of-fame" | "/auth" | "/account";
+
+function NavLink({ to, onClick, children }: { to: NavTo; onClick: () => void; children: React.ReactNode }) {
   return (
     <Link
       to={to}

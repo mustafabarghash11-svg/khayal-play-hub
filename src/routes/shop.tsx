@@ -136,7 +136,7 @@ function ItemCard({ item, userLoggedIn, balance, onChange }: {
 
   async function redeem() {
     setBusy(true); setErr(null);
-    const { error } = await supabase.rpc("redeem_shop_item", { _item_id: item.id, _user_notes: notes.trim().slice(0, 280) || null });
+    const { error } = await supabase.rpc("redeem_shop_item", { _item_id: item.id, _user_notes: notes.trim().slice(0, 280) || "" });
     setBusy(false);
     if (error) setErr(error.message);
     else { setOpen(false); setNotes(""); onChange(); }

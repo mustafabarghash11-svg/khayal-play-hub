@@ -9,17 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TournamentsRouteImport } from './routes/tournaments'
 import { Route as StreamersRouteImport } from './routes/streamers'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as DevkRouteImport } from './routes/devk'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 
+const TournamentsRoute = TournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StreamersRoute = StreamersRouteImport.update({
   id: '/streamers',
   path: '/streamers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -42,6 +56,16 @@ const DevkRoute = DevkRouteImport.update({
   path: '/devk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,79 +79,121 @@ const SSlugRoute = SSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
   '/hall-of-fame': typeof HallOfFameRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/shop': typeof ShopRoute
   '/streamers': typeof StreamersRoute
+  '/tournaments': typeof TournamentsRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
   '/hall-of-fame': typeof HallOfFameRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/shop': typeof ShopRoute
   '/streamers': typeof StreamersRoute
+  '/tournaments': typeof TournamentsRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/auth': typeof AuthRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
   '/hall-of-fame': typeof HallOfFameRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/shop': typeof ShopRoute
   '/streamers': typeof StreamersRoute
+  '/tournaments': typeof TournamentsRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
+    | '/auth'
     | '/devk'
     | '/games'
     | '/hall-of-fame'
     | '/leaderboard'
+    | '/shop'
     | '/streamers'
+    | '/tournaments'
     | '/s/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
+    | '/auth'
     | '/devk'
     | '/games'
     | '/hall-of-fame'
     | '/leaderboard'
+    | '/shop'
     | '/streamers'
+    | '/tournaments'
     | '/s/$slug'
   id:
     | '__root__'
     | '/'
+    | '/account'
+    | '/auth'
     | '/devk'
     | '/games'
     | '/hall-of-fame'
     | '/leaderboard'
+    | '/shop'
     | '/streamers'
+    | '/tournaments'
     | '/s/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  AuthRoute: typeof AuthRoute
   DevkRoute: typeof DevkRoute
   GamesRoute: typeof GamesRoute
   HallOfFameRoute: typeof HallOfFameRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  ShopRoute: typeof ShopRoute
   StreamersRoute: typeof StreamersRoute
+  TournamentsRoute: typeof TournamentsRoute
   SSlugRoute: typeof SSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tournaments': {
+      id: '/tournaments'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof TournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/streamers': {
       id: '/streamers'
       path: '/streamers'
       fullPath: '/streamers'
       preLoaderRoute: typeof StreamersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -158,6 +224,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -177,11 +257,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  AuthRoute: AuthRoute,
   DevkRoute: DevkRoute,
   GamesRoute: GamesRoute,
   HallOfFameRoute: HallOfFameRoute,
   LeaderboardRoute: LeaderboardRoute,
+  ShopRoute: ShopRoute,
   StreamersRoute: StreamersRoute,
+  TournamentsRoute: TournamentsRoute,
   SSlugRoute: SSlugRoute,
 }
 export const routeTree = rootRouteImport
