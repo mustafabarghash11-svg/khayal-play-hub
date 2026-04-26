@@ -64,7 +64,7 @@ function TournamentsAdmin() {
 
   async function add() {
     if (!form.title || !form.game || !form.start_date) return toast.error("املأ الحقول الأساسية");
-    const { error } = await supabase.from("tournaments").insert({ ...form, max_participants: Number(form.max_participants) || 16 });
+    const { error } = await supabase.from("tournaments").insert({ ...form, status: form.status as any, max_participants: Number(form.max_participants) || 16 });
     if (error) toast.error(error.message); else { toast.success("تمت الإضافة"); setForm({ title: "", game: "", description: "", image_url: "", start_date: "", max_participants: 16, prize: "", status: "open" }); load(); }
   }
   async function remove(id: string) {
@@ -73,7 +73,7 @@ function TournamentsAdmin() {
     if (error) toast.error(error.message); else { toast.success("تم الحذف"); load(); }
   }
   async function setStatus(id: string, status: string) {
-    const { error } = await supabase.from("tournaments").update({ status }).eq("id", id);
+    const { error } = await supabase.from("tournaments").update({ status: status as any }).eq("id", id);
     if (error) toast.error(error.message); else load();
   }
 
@@ -193,7 +193,7 @@ function OrdersAdmin() {
   useEffect(() => { load(); }, []);
 
   async function setStatus(id: string, status: string) {
-    const { error } = await supabase.from("shop_orders").update({ status }).eq("id", id);
+    const { error } = await supabase.from("shop_orders").update({ status: status as any }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("تحدّث"); load(); }
   }
 
