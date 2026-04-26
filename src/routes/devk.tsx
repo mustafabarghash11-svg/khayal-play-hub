@@ -37,7 +37,7 @@ export const Route = createFileRoute("/devk")({
   component: DevPanel,
 });
 
-// ─── Auth Gate ──────────────────────────────────────────────────────────────
+// --- Auth Gate --------------------------------------------------------------
 function DevPanel() {
   const [authed, setAuthed] = useState(false);
   const [code, setCode] = useState("");
@@ -120,7 +120,7 @@ function DevPanel() {
   return <Panel />;
 }
 
-// ─── Tab definitions ─────────────────────────────────────────────────────────
+// --- Tab definitions ---------------------------------------------------------
 type TabId = "overview" | "site" | "games" | "community" | "accounts" | "points" | "shop";
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode; badge?: string }[] = [
@@ -133,7 +133,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode; badge?: string }[
   { id: "shop", label: "المتجر", icon: <ShoppingBag className="w-4 h-4" /> },
 ];
 
-// ─── Main Panel ──────────────────────────────────────────────────────────────
+// --- Main Panel --------------------------------------------------------------
 function Panel() {
   const [data, setData] = useSiteData();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
@@ -283,7 +283,7 @@ function Panel() {
     >
       <Toaster richColors position="top-center" />
 
-      {/* ── Top Bar ─────────────────────────────── */}
+      {/* -- Top Bar ------------------------------- */}
       <header className="sticky top-0 z-50 bg-[#0d1117]/90 backdrop-blur border-b border-[#30363d] px-4 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-[#22d3ee]/20 flex items-center justify-center">
@@ -312,7 +312,7 @@ function Panel() {
       </header>
 
       <div className="flex">
-        {/* ── Sidebar ─────────────────────────────── */}
+        {/* -- Sidebar ------------------------------- */}
         <aside className="hidden md:flex flex-col w-52 sticky top-14 h-[calc(100vh-3.5rem)] bg-[#0d1117] border-l border-[#30363d] p-3 gap-1 overflow-y-auto shrink-0">
           {TABS.map((tab) => (
             <button
@@ -336,7 +336,7 @@ function Panel() {
           </div>
         </aside>
 
-        {/* ── Mobile tab picker ─────────────────── */}
+        {/* -- Mobile tab picker ------------------- */}
         <div className="md:hidden sticky top-14 z-40 bg-[#0d1117] border-b border-[#30363d] w-full px-4 py-2">
           <button
             className="flex items-center justify-between w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm"
@@ -365,10 +365,10 @@ function Panel() {
           )}
         </div>
 
-        {/* ── Main content ────────────────────────── */}
+        {/* -- Main content -------------------------- */}
         <main className="flex-1 min-w-0 p-4 md:p-6 space-y-6 max-w-4xl">
 
-          {/* ══ OVERVIEW ══ */}
+          {/* == OVERVIEW == */}
           {activeTab === "overview" && (
             <div className="space-y-6">
               <PageTitle icon="📊" title="نظرة عامة" subtitle="إحصائيات سريعة عن الموقع" />
@@ -410,7 +410,7 @@ function Panel() {
             </div>
           )}
 
-          {/* ══ SITE INFO ══ */}
+          {/* == SITE INFO == */}
           {activeTab === "site" && (
             <div className="space-y-5">
               <PageTitle icon="🌐" title="إعدادات الموقع" subtitle="المعلومات الأساسية والأقسام المخصصة" />
