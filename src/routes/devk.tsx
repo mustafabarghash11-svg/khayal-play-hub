@@ -1,56 +1,118 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useSiteData, defaultData, normalizeDigits, type Game, type ServerStat, type ServerPerk, type CustomSection, type Block, type Streamer, type LeaderboardEntry, type HallOfFameEntry } from "@/lib/khayal-store";
+import { useState, useEffect, useCallback } from "react";
+import {
+  useSiteData,
+  defaultData,
+  normalizeDigits,
+  type Game,
+  type ServerStat,
+  type ServerPerk,
+  type CustomSection,
+  type Block,
+  type Streamer,
+  type LeaderboardEntry,
+  type HallOfFameEntry,
+} from "@/lib/khayal-store";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { toast, Toaster } from "sonner";
-import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "@/components/ImageUpload";
+import { toast, Toaster } from "sonner";
+import {
+  Trash2, Plus, ArrowUp, ArrowDown,
+  Users, Coins, ShoppingBag, Globe,
+  Trophy, Gamepad2, Star, Settings,
+  Edit3, X, Check, Search, ChevronDown,
+  Package, Shield, TrendingUp, Zap,
+  LayoutDashboard, Eye, RefreshCw,
+} from "lucide-react";
 
 export const Route = createFileRoute("/devk")({
-  head: () => ({ meta: [{ title: "Dev Panel" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "لوحة المطور" }, { name: "robots", content: "noindex" }],
+  }),
   component: DevPanel,
 });
 
+// ─── Auth Gate ──────────────────────────────────────────────────────────────
 function DevPanel() {
   const [authed, setAuthed] = useState(false);
   const [code, setCode] = useState("");
+  const [shake, setShake] = useState(false);
 
   if (!authed) {
     return (
-      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-background p-6">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const cleaned = normalizeDigits(code).trim();
-            const expected = (import.meta.env.VITE_DEVK_PIN as string | undefined)?.trim() || "87";
-            if (cleaned && cleaned === expected) {
-              setAuthed(true);
-              toast.success("مرحباً بك");
-            } else {
-              toast.error("كود خاطئ");
-            }
+      <div
+        dir="rtl"
+        className="min-h-screen flex items-center justify-center bg-[#080c10] p-6"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse at 30% 20%, rgba(34,211,238,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(16,185,129,0.04) 0%, transparent 50%)",
+        }}
+      >
+        <div
+          className={`w-full max-w-sm ${shake ? "animate-[shake_0.4s_ease]" : ""}`}
+          style={{
+            animation: shake ? "shake 0.4s ease" : undefined,
           }}
-          className="w-full max-w-sm bg-card border border-border rounded-2xl p-8 space-y-4"
         >
-          <h1 className="text-2xl font-black text-center">🔒 دخول المطور</h1>
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder="الكود السري"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="text-center text-lg"
-            autoFocus
-          />
-          <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
-            دخول
-          </Button>
-        </form>
-        <Toaster richColors />
+          <div className="bg-[#0d1117] border border-[#22d3ee]/20 rounded-2xl p-8 space-y-6 shadow-2xl shadow-[#22d3ee]/5">
+            <div className="text-center space-y-2">
+              <div className="text-5xl mb-3">🔐</div>
+              <h1 className="text-2xl font-black text-white">لوحة المطور</h1>
+              <p className="text-sm text-[#8b9ab0]">أدخل الكود للمتابعة</p>
+            </div>
+            <Input
+              type="password"
+              inputMode="numeric"
+              placeholder="••••••"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const cleaned = normalizeDigits(code).trim();
+                  const expected =
+                    (import.meta.env.VITE_DEVK_PIN as string | undefined)?.trim() || "87";
+                  if (cleaned === expected) {
+                    setAuthed(true);
+                    toast.success("مرحباً بك 👋");
+                  } else {
+                    setShake(true);
+                    setTimeout(() => setShake(false), 500);
+                    toast.error("كود خاطئ");
+                    setCode("");
+                  }
+                }
+              }}
+              className="text-center text-xl tracking-widest bg-[#161b22] border-[#30363d] text-white h-12"
+              autoFocus
+            />
+            <Button
+              className="w-full bg-[#22d3ee] hover:bg-[#22d3ee]/90 text-[#080c10] font-black h-12 text-base"
+              onClick={() => {
+                const cleaned = normalizeDigits(code).trim();
+                const expected =
+                  (import.meta.env.VITE_DEVK_PIN as string | undefined)?.trim() || "87";
+                if (cleaned === expected) {
+                  setAuthed(true);
+                  toast.success("مرحباً بك 👋");
+                } else {
+                  setShake(true);
+                  setTimeout(() => setShake(false), 500);
+                  toast.error("كود خاطئ");
+                  setCode("");
+                }
+              }}
+            >
+              دخول
+            </Button>
+          </div>
+        </div>
+        <Toaster richColors position="top-center" />
+        <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}`}</style>
       </div>
     );
   }
@@ -58,47 +120,111 @@ function DevPanel() {
   return <Panel />;
 }
 
+// ─── Tab definitions ─────────────────────────────────────────────────────────
+type TabId = "overview" | "site" | "games" | "community" | "accounts" | "points" | "shop";
+
+const TABS: { id: TabId; label: string; icon: React.ReactNode; badge?: string }[] = [
+  { id: "overview", label: "نظرة عامة", icon: <LayoutDashboard className="w-4 h-4" /> },
+  { id: "site", label: "الموقع", icon: <Globe className="w-4 h-4" /> },
+  { id: "games", label: "الألعاب", icon: <Gamepad2 className="w-4 h-4" /> },
+  { id: "community", label: "المجتمع", icon: <Trophy className="w-4 h-4" /> },
+  { id: "accounts", label: "الحسابات", icon: <Users className="w-4 h-4" /> },
+  { id: "points", label: "النقاط", icon: <Star className="w-4 h-4" /> },
+  { id: "shop", label: "المتجر", icon: <ShoppingBag className="w-4 h-4" /> },
+];
+
+// ─── Main Panel ──────────────────────────────────────────────────────────────
 function Panel() {
   const [data, setData] = useSiteData();
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const update = (patch: Partial<typeof data>) => setData({ ...data, ...patch });
 
-  // Games
-  const updateGame = (id: string, patch: Partial<Game>) => update({ games: data.games.map((g) => g.id === id ? { ...g, ...patch } : g) });
-  const deleteGame = (id: string) => update({ games: data.games.filter((g) => g.id !== id) });
-  const addGame = () => update({ games: [...data.games, { id: Date.now().toString(), name: "لعبة جديدة", image: "https://placehold.co/600x800/0d3b3e/22d3ee?text=Game", link: "#", description: "وصف اللعبة" }] });
+  // Supabase data
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [shopItems, setShopItems] = useState<any[]>([]);
+  const [shopOrders, setShopOrders] = useState<any[]>([]);
+  const [loadingDB, setLoadingDB] = useState(false);
+  const [profileSearch, setProfileSearch] = useState("");
 
-  // Server stats
-  const updateStat = (id: string, patch: Partial<ServerStat>) => update({ serverStats: data.serverStats.map((s) => s.id === id ? { ...s, ...patch } : s) });
-  const deleteStat = (id: string) => update({ serverStats: data.serverStats.filter((s) => s.id !== id) });
-  const addStat = () => update({ serverStats: [...data.serverStats, { id: Date.now().toString(), label: "تسمية", value: "0", icon: "📊" }] });
+  const loadDB = useCallback(async () => {
+    setLoadingDB(true);
+    const [{ data: p }, { data: si }, { data: so }] = await Promise.all([
+      supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+      supabase.from("shop_items").select("*").order("price_points"),
+      supabase.from("shop_orders").select("*, shop_items(name), profiles(display_name)").order("created_at", { ascending: false }).limit(50),
+    ]);
+    setProfiles((p as any[]) ?? []);
+    setShopItems((si as any[]) ?? []);
+    setShopOrders((so as any[]) ?? []);
+    setLoadingDB(false);
+  }, []);
 
-  // Server perks
-  const updatePerk = (id: string, patch: Partial<ServerPerk>) => update({ serverPerks: data.serverPerks.map((p) => p.id === id ? { ...p, ...patch } : p) });
-  const deletePerk = (id: string) => update({ serverPerks: data.serverPerks.filter((p) => p.id !== id) });
-  const addPerk = () => update({ serverPerks: [...data.serverPerks, { id: Date.now().toString(), title: "ميزة جديدة", description: "وصف", icon: "✨" }] });
+  useEffect(() => {
+    if (["accounts", "points", "shop", "overview"].includes(activeTab)) {
+      loadDB();
+    }
+  }, [activeTab, loadDB]);
 
-  // Streamers
-  const updateStreamer = (id: string, patch: Partial<Streamer>) => update({ streamers: data.streamers.map((s) => s.id === id ? { ...s, ...patch } : s) });
-  const deleteStreamer = (id: string) => update({ streamers: data.streamers.filter((s) => s.id !== id) });
-  const addStreamer = () => update({ streamers: [...data.streamers, { id: Date.now().toString(), name: "اسم الستريمر", image: "", platform: "Twitch", link: "https://", isLive: false }] });
+  // Games handlers
+  const updateGame = (id: string, patch: Partial<Game>) =>
+    update({ games: data.games.map((g) => (g.id === id ? { ...g, ...patch } : g)) });
+  const deleteGame = (id: string) =>
+    update({ games: data.games.filter((g) => g.id !== id) });
+  const addGame = () =>
+    update({
+      games: [...data.games, { id: Date.now().toString(), name: "لعبة جديدة", image: "https://placehold.co/600x800/0d3b3e/22d3ee?text=Game", link: "#", description: "وصف اللعبة" }],
+    });
 
-  // Leaderboard
-  const updateLeader = (id: string, patch: Partial<LeaderboardEntry>) => update({ leaderboard: data.leaderboard.map((p) => p.id === id ? { ...p, ...patch } : p) });
-  const deleteLeader = (id: string) => update({ leaderboard: data.leaderboard.filter((p) => p.id !== id) });
-  const addLeader = () => update({ leaderboard: [...data.leaderboard, { id: Date.now().toString(), rank: data.leaderboard.length + 1, name: "اسم اللاعب", image: "", points: 0, badge: "" }] });
+  // Stats handlers
+  const updateStat = (id: string, patch: Partial<ServerStat>) =>
+    update({ serverStats: data.serverStats.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
+  const deleteStat = (id: string) =>
+    update({ serverStats: data.serverStats.filter((s) => s.id !== id) });
+  const addStat = () =>
+    update({ serverStats: [...data.serverStats, { id: Date.now().toString(), label: "تسمية", value: "0", icon: "📊" }] });
 
-  // Hall of Fame
-  const updateHof = (id: string, patch: Partial<HallOfFameEntry>) => update({ hallOfFame: data.hallOfFame.map((c) => c.id === id ? { ...c, ...patch } : c) });
-  const deleteHof = (id: string) => update({ hallOfFame: data.hallOfFame.filter((c) => c.id !== id) });
-  const addHof = () => update({ hallOfFame: [...data.hallOfFame, { id: Date.now().toString(), championName: "اسم البطل", image: "", tournament: "اسم البطولة", year: new Date().getFullYear().toString() }] });
+  // Perks handlers
+  const updatePerk = (id: string, patch: Partial<ServerPerk>) =>
+    update({ serverPerks: data.serverPerks.map((p) => (p.id === id ? { ...p, ...patch } : p)) });
+  const deletePerk = (id: string) =>
+    update({ serverPerks: data.serverPerks.filter((p) => p.id !== id) });
+  const addPerk = () =>
+    update({ serverPerks: [...data.serverPerks, { id: Date.now().toString(), title: "ميزة جديدة", description: "وصف", icon: "✨" }] });
 
-  // Custom sections
+  // Streamers handlers
+  const updateStreamer = (id: string, patch: Partial<Streamer>) =>
+    update({ streamers: data.streamers.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
+  const deleteStreamer = (id: string) =>
+    update({ streamers: data.streamers.filter((s) => s.id !== id) });
+  const addStreamer = () =>
+    update({ streamers: [...data.streamers, { id: Date.now().toString(), name: "اسم الستريمر", image: "", platform: "Twitch", link: "https://", isLive: false }] });
+
+  // Leaderboard handlers
+  const updateLeader = (id: string, patch: Partial<LeaderboardEntry>) =>
+    update({ leaderboard: data.leaderboard.map((p) => (p.id === id ? { ...p, ...patch } : p)) });
+  const deleteLeader = (id: string) =>
+    update({ leaderboard: data.leaderboard.filter((p) => p.id !== id) });
+  const addLeader = () =>
+    update({ leaderboard: [...data.leaderboard, { id: Date.now().toString(), rank: data.leaderboard.length + 1, name: "اسم اللاعب", image: "", points: 0, badge: "" }] });
+
+  // Hall of fame handlers
+  const updateHof = (id: string, patch: Partial<HallOfFameEntry>) =>
+    update({ hallOfFame: data.hallOfFame.map((c) => (c.id === id ? { ...c, ...patch } : c)) });
+  const deleteHof = (id: string) =>
+    update({ hallOfFame: data.hallOfFame.filter((c) => c.id !== id) });
+  const addHof = () =>
+    update({ hallOfFame: [...data.hallOfFame, { id: Date.now().toString(), championName: "اسم البطل", image: "", tournament: "اسم البطولة", year: new Date().getFullYear().toString() }] });
+
+  // Custom sections handlers
   const addSection = () => {
     const id = Date.now().toString();
     update({ customSections: [...data.customSections, { id, slug: `sec-${id}`, title: "قسم جديد", blocks: [] }] });
   };
-  const updateSection = (id: string, patch: Partial<CustomSection>) => update({ customSections: data.customSections.map((s) => s.id === id ? { ...s, ...patch } : s) });
-  const deleteSection = (id: string) => update({ customSections: data.customSections.filter((s) => s.id !== id) });
+  const updateSection = (id: string, patch: Partial<CustomSection>) =>
+    update({ customSections: data.customSections.map((s) => (s.id === id ? { ...s, ...patch } : s)) });
+  const deleteSection = (id: string) =>
+    update({ customSections: data.customSections.filter((s) => s.id !== id) });
   const moveSection = (id: string, dir: -1 | 1) => {
     const arr = [...data.customSections];
     const i = arr.findIndex((s) => s.id === id);
@@ -107,7 +233,6 @@ function Panel() {
     [arr[i], arr[j]] = [arr[j], arr[i]];
     update({ customSections: arr });
   };
-
   const addBlock = (sectionId: string, type: Block["type"]) => {
     const id = Date.now().toString();
     let block: Block;
@@ -120,7 +245,7 @@ function Panel() {
   const updateBlock = (sectionId: string, blockId: string, patch: Partial<Block>) => {
     const sec = data.customSections.find((s) => s.id === sectionId);
     if (!sec) return;
-    updateSection(sectionId, { blocks: sec.blocks.map((b) => b.id === blockId ? ({ ...b, ...patch } as Block) : b) });
+    updateSection(sectionId, { blocks: sec.blocks.map((b) => (b.id === blockId ? ({ ...b, ...patch } as Block) : b)) });
   };
   const deleteBlock = (sectionId: string, blockId: string) => {
     const sec = data.customSections.find((s) => s.id === sectionId);
@@ -138,220 +263,162 @@ function Panel() {
     updateSection(sectionId, { blocks: arr });
   };
 
+  const filteredProfiles = profiles.filter(
+    (p) =>
+      !profileSearch ||
+      p.display_name?.toLowerCase().includes(profileSearch.toLowerCase()) ||
+      p.discord_username?.toLowerCase().includes(profileSearch.toLowerCase())
+  );
+
+  const activeTabLabel = TABS.find((t) => t.id === activeTab)?.label ?? "";
+
   return (
-    <div dir="rtl" className="min-h-screen bg-background text-foreground p-4 md:p-6">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-2xl md:text-3xl font-black">⚙️ لوحة المطور</h1>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => { if (confirm("استرجاع الإعدادات الافتراضية؟")) { setData(defaultData); toast.success("تم"); } }}>استرجاع</Button>
-            <Button asChild variant="outline"><a href="/">عرض الموقع</a></Button>
+    <div
+      dir="rtl"
+      className="min-h-screen bg-[#080c10] text-white"
+      style={{
+        backgroundImage:
+          "radial-gradient(ellipse at 10% 10%, rgba(34,211,238,0.04) 0%, transparent 40%)",
+      }}
+    >
+      <Toaster richColors position="top-center" />
+
+      {/* ── Top Bar ─────────────────────────────── */}
+      <header className="sticky top-0 z-50 bg-[#0d1117]/90 backdrop-blur border-b border-[#30363d] px-4 md:px-6 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-lg bg-[#22d3ee]/20 flex items-center justify-center">
+            <Settings className="w-4 h-4 text-[#22d3ee]" />
           </div>
+          <span className="font-black text-sm text-white">لوحة المطور</span>
+          <span className="hidden sm:inline text-[#22d3ee] text-xs font-mono bg-[#22d3ee]/10 px-2 py-0.5 rounded-full">/devk</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[#8b9ab0] hover:text-white h-8 px-3 text-xs"
+            onClick={() => { if (confirm("استرجاع الإعدادات الافتراضية؟")) { setData(defaultData); toast.success("تم الاسترجاع"); } }}
+          >
+            <RefreshCw className="w-3 h-3 ml-1" />
+            استرجاع
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="text-[#8b9ab0] hover:text-white h-8 px-3 text-xs">
+            <a href="/" target="_blank" rel="noopener noreferrer">
+              <Eye className="w-3 h-3 ml-1" />
+              عرض
+            </a>
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* ── Sidebar ─────────────────────────────── */}
+        <aside className="hidden md:flex flex-col w-52 sticky top-14 h-[calc(100vh-3.5rem)] bg-[#0d1117] border-l border-[#30363d] p-3 gap-1 overflow-y-auto shrink-0">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-right w-full ${
+                activeTab === tab.id
+                  ? "bg-[#22d3ee]/15 text-[#22d3ee] border border-[#22d3ee]/25"
+                  : "text-[#8b9ab0] hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <span className={activeTab === tab.id ? "text-[#22d3ee]" : "text-[#8b9ab0]"}>
+                {tab.icon}
+              </span>
+              {tab.label}
+            </button>
+          ))}
+
+          <div className="mt-auto pt-4 border-t border-[#30363d]">
+            <p className="text-[10px] text-[#8b9ab0] text-center">التغييرات تُحفظ تلقائياً</p>
+          </div>
+        </aside>
+
+        {/* ── Mobile tab picker ─────────────────── */}
+        <div className="md:hidden sticky top-14 z-40 bg-[#0d1117] border-b border-[#30363d] w-full px-4 py-2">
+          <button
+            className="flex items-center justify-between w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <span className="flex items-center gap-2 text-[#22d3ee] font-medium">
+              {TABS.find((t) => t.id === activeTab)?.icon}
+              {activeTabLabel}
+            </span>
+            <ChevronDown className={`w-4 h-4 text-[#8b9ab0] transition-transform ${mobileMenuOpen ? "rotate-180" : ""}`} />
+          </button>
+          {mobileMenuOpen && (
+            <div className="absolute top-full right-0 left-0 bg-[#0d1117] border-b border-[#30363d] p-2 grid grid-cols-2 gap-1">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+                    activeTab === tab.id ? "bg-[#22d3ee]/15 text-[#22d3ee]" : "text-[#8b9ab0] hover:bg-white/5"
+                  }`}
+                >
+                  {tab.icon}{tab.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Site info */}
-        <Section title="معلومات الموقع">
-          <Field label="اسم الموقع"><Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} /></Field>
-          <Field label="الوصف"><Textarea value={data.tagline} onChange={(e) => update({ tagline: e.target.value })} /></Field>
-          <Field label="رابط الديسكورد"><Input value={data.discordLink} onChange={(e) => update({ discordLink: e.target.value })} /></Field>
-          <Field label="Discord Server ID (لعرض عدد المتصلين مباشرة — فعّل Widget من إعدادات السيرفر)">
-            <Input value={data.discordServerId} onChange={(e) => update({ discordServerId: e.target.value })} placeholder="123456789012345678" />
-          </Field>
-          <div className="flex items-center justify-between rounded-lg border border-border p-3">
-            <Label>عرض عداد الزوار في الصفحة الرئيسية</Label>
-            <Switch checked={data.showVisitorCounter} onCheckedChange={(v) => update({ showVisitorCounter: v })} />
-          </div>
-        </Section>
+        {/* ── Main content ────────────────────────── */}
+        <main className="flex-1 min-w-0 p-4 md:p-6 space-y-6 max-w-4xl">
 
-        {/* Games */}
-        <Section title={`الألعاب (${data.games.length})`} action={<Button onClick={addGame} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />لعبة</Button>}>
-          {data.games.map((g) => (
-            <div key={g.id} className="border border-border rounded-xl p-4 space-y-3">
-              <div className="grid sm:grid-cols-2 gap-2">
-                <Input placeholder="الاسم" value={g.name} onChange={(e) => updateGame(g.id, { name: e.target.value })} />
-                <Input placeholder="الرابط" value={g.link} onChange={(e) => updateGame(g.id, { link: e.target.value })} />
-              </div>
-              <ImageUpload value={g.image} onChange={(v) => updateGame(g.id, { image: v })} placeholder="رابط الصورة أو ارفع ملف" />
-              <Input placeholder="الوصف" value={g.description} onChange={(e) => updateGame(g.id, { description: e.target.value })} />
-              <Button variant="destructive" size="sm" onClick={() => deleteGame(g.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-            </div>
-          ))}
-        </Section>
-
-        {/* Server stats */}
-        <Section title={`إحصائيات السيرفر (${data.serverStats.length})`} action={<Button onClick={addStat} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />إحصائية</Button>}>
-          {data.serverStats.map((s) => (
-            <div key={s.id} className="border border-border rounded-xl p-4 grid grid-cols-[60px_1fr] gap-3 items-start">
-              <Input value={s.icon} onChange={(e) => updateStat(s.id, { icon: e.target.value })} className="text-2xl text-center h-full" />
-              <div className="space-y-2">
-                <Input placeholder="القيمة (مثل 5,000+)" value={s.value} onChange={(e) => updateStat(s.id, { value: e.target.value })} />
-                <Input placeholder="التسمية (مثل عضو)" value={s.label} onChange={(e) => updateStat(s.id, { label: e.target.value })} />
-                <Button variant="destructive" size="sm" onClick={() => deleteStat(s.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-              </div>
-            </div>
-          ))}
-        </Section>
-
-        {/* Server perks */}
-        <Section title={`مميزات السيرفر (${data.serverPerks.length})`} action={<Button onClick={addPerk} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ميزة</Button>}>
-          {data.serverPerks.map((p) => (
-            <div key={p.id} className="border border-border rounded-xl p-4 grid grid-cols-[60px_1fr] gap-3 items-start">
-              <Input value={p.icon} onChange={(e) => updatePerk(p.id, { icon: e.target.value })} className="text-2xl text-center h-full" />
-              <div className="space-y-2">
-                <Input placeholder="العنوان" value={p.title} onChange={(e) => updatePerk(p.id, { title: e.target.value })} />
-                <Input placeholder="الوصف" value={p.description} onChange={(e) => updatePerk(p.id, { description: e.target.value })} />
-                <Button variant="destructive" size="sm" onClick={() => deletePerk(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-              </div>
-            </div>
-          ))}
-        </Section>
-
-        {/* Streamers */}
-        <Section title={`الستريمرز / المبدعون (${data.streamers.length})`} action={<Button onClick={addStreamer} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />ستريمر</Button>}>
-          {data.streamers.map((s) => (
-            <div key={s.id} className="border border-border rounded-xl p-4 space-y-3">
-              <div className="grid sm:grid-cols-2 gap-2">
-                <Input placeholder="الاسم" value={s.name} onChange={(e) => updateStreamer(s.id, { name: e.target.value })} />
-                <Input placeholder="المنصة (Twitch, YouTube, Kick, TikTok...)" value={s.platform} onChange={(e) => updateStreamer(s.id, { platform: e.target.value })} />
-              </div>
-              <Input placeholder="رابط القناة" value={s.link} onChange={(e) => updateStreamer(s.id, { link: e.target.value })} />
-              <ImageUpload value={s.image} onChange={(v) => updateStreamer(s.id, { image: v })} placeholder="صورة الستريمر" />
-              <div className="flex items-center justify-between rounded-lg bg-background/40 p-3">
-                <Label className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${s.isLive ? "bg-red-500 animate-pulse" : "bg-muted-foreground"}`} />
-                  {s.isLive ? "حالياً LIVE 🔴" : "غير متصل"}
-                </Label>
-                <Switch checked={s.isLive} onCheckedChange={(v) => updateStreamer(s.id, { isLive: v })} />
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => deleteStreamer(s.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-            </div>
-          ))}
-        </Section>
-
-        {/* Upcoming event */}
-        <Section title="الإيفنت القادم (Countdown)" action={
-          data.upcomingEvent
-            ? <Button variant="destructive" size="sm" onClick={() => update({ upcomingEvent: null })}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-            : <Button size="sm" className="bg-accent text-accent-foreground" onClick={() => update({ upcomingEvent: { id: Date.now().toString(), title: "بطولة جديدة", description: "وصف الإيفنت", date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 16) } })}><Plus className="w-4 h-4 ml-1" />إضافة</Button>
-        }>
-          {data.upcomingEvent ? (
-            <div className="space-y-3">
-              <Field label="عنوان الإيفنت"><Input value={data.upcomingEvent.title} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, title: e.target.value } })} /></Field>
-              <Field label="الوصف"><Textarea value={data.upcomingEvent.description} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, description: e.target.value } })} /></Field>
-              <Field label="التاريخ والوقت">
-                <Input type="datetime-local" value={data.upcomingEvent.date.slice(0, 16)} onChange={(e) => update({ upcomingEvent: { ...data.upcomingEvent!, date: new Date(e.target.value).toISOString() } })} />
-              </Field>
-            </div>
-          ) : <p className="text-sm text-muted-foreground text-center py-2">لا يوجد إيفنت حالياً</p>}
-        </Section>
-
-        {/* Leaderboard */}
-        <Section title={`أفضل اللاعبين (${data.leaderboard.length})`} action={<Button onClick={addLeader} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />لاعب</Button>}>
-          {data.leaderboard.map((p) => (
-            <div key={p.id} className="border border-border rounded-xl p-4 space-y-3">
-              <div className="grid grid-cols-[80px_1fr] gap-2">
-                <Input type="number" placeholder="الترتيب" value={p.rank} onChange={(e) => updateLeader(p.id, { rank: Number(e.target.value) || 1 })} />
-                <Input placeholder="اسم اللاعب" value={p.name} onChange={(e) => updateLeader(p.id, { name: e.target.value })} />
-              </div>
-              <ImageUpload value={p.image} onChange={(v) => updateLeader(p.id, { image: v })} placeholder="صورة اللاعب" />
-              <div className="grid sm:grid-cols-2 gap-2">
-                <Input type="number" placeholder="النقاط" value={p.points} onChange={(e) => updateLeader(p.id, { points: Number(e.target.value) || 0 })} />
-                <Input placeholder="الشارة (مثل: محترف)" value={p.badge} onChange={(e) => updateLeader(p.id, { badge: e.target.value })} />
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => deleteLeader(p.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-            </div>
-          ))}
-        </Section>
-
-        {/* Hall of Fame */}
-        <Section title={`قاعة الأبطال (${data.hallOfFame.length})`} action={<Button onClick={addHof} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />بطل</Button>}>
-          {data.hallOfFame.map((c) => (
-            <div key={c.id} className="border border-border rounded-xl p-4 space-y-3">
-              <Input placeholder="اسم البطل" value={c.championName} onChange={(e) => updateHof(c.id, { championName: e.target.value })} />
-              <ImageUpload value={c.image} onChange={(v) => updateHof(c.id, { image: v })} placeholder="صورة البطل" />
-              <div className="grid sm:grid-cols-2 gap-2">
-                <Input placeholder="اسم البطولة" value={c.tournament} onChange={(e) => updateHof(c.id, { tournament: e.target.value })} />
-                <Input placeholder="السنة" value={c.year} onChange={(e) => updateHof(c.id, { year: e.target.value })} />
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => deleteHof(c.id)}><Trash2 className="w-4 h-4 ml-1" />حذف</Button>
-            </div>
-          ))}
-        </Section>
-
-        {/* Custom sections */}
-        <Section title={`أقسام مخصصة (${data.customSections.length})`} action={<Button onClick={addSection} size="sm" className="bg-accent text-accent-foreground"><Plus className="w-4 h-4 ml-1" />قسم</Button>}>
-          {data.customSections.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">لا توجد أقسام بعد. أضف واحداً وابدأ بإضافة نصوص، صور، وأزرار.</p>}
-          {data.customSections.map((sec, idx) => (
-            <div key={sec.id} className="border-2 border-accent/30 rounded-2xl p-4 space-y-3 bg-background/40">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Input value={sec.title} onChange={(e) => updateSection(sec.id, { title: e.target.value })} placeholder="عنوان القسم" className="flex-1 min-w-[150px] font-bold" />
-                <Button size="icon" variant="outline" onClick={() => moveSection(sec.id, -1)} disabled={idx === 0}><ArrowUp className="w-4 h-4" /></Button>
-                <Button size="icon" variant="outline" onClick={() => moveSection(sec.id, 1)} disabled={idx === data.customSections.length - 1}><ArrowDown className="w-4 h-4" /></Button>
-                <Button size="icon" variant="destructive" onClick={() => deleteSection(sec.id)}><Trash2 className="w-4 h-4" /></Button>
+          {/* ══ OVERVIEW ══ */}
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              <PageTitle icon="📊" title="نظرة عامة" subtitle="إحصائيات سريعة عن الموقع" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <StatCard icon={<Gamepad2 className="w-5 h-5" />} label="الألعاب" value={data.games.length} color="#22d3ee" />
+                <StatCard icon={<Users className="w-5 h-5" />} label="الأعضاء" value={profiles.length} color="#10b981" loading={loadingDB} />
+                <StatCard icon={<ShoppingBag className="w-5 h-5" />} label="منتجات المتجر" value={shopItems.length} color="#f59e0b" loading={loadingDB} />
+                <StatCard icon={<Package className="w-5 h-5" />} label="الطلبات" value={shopOrders.length} color="#8b5cf6" loading={loadingDB} />
               </div>
 
-              <div className="space-y-2 pl-2 border-r-2 border-accent/20 pr-3">
-                {sec.blocks.map((b, bi) => (
-                  <div key={b.id} className="bg-card border border-border rounded-lg p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-accent">{labelFor(b.type)}</span>
-                      <div className="flex gap-1">
-                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => moveBlock(sec.id, b.id, -1)} disabled={bi === 0}><ArrowUp className="w-3 h-3" /></Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => moveBlock(sec.id, b.id, 1)} disabled={bi === sec.blocks.length - 1}><ArrowDown className="w-3 h-3" /></Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteBlock(sec.id, b.id)}><Trash2 className="w-3 h-3" /></Button>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Card title="آخر الأعضاء" icon={<Users className="w-4 h-4 text-[#10b981]" />}>
+                  {loadingDB ? <LoadingRows /> : profiles.slice(0, 5).map((p) => (
+                    <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[#21262d] last:border-0">
+                      <div className="w-8 h-8 rounded-full bg-[#22d3ee]/20 flex items-center justify-center text-sm font-bold text-[#22d3ee]">
+                        {p.display_name?.[0]?.toUpperCase() ?? "?"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{p.display_name}</p>
+                        <p className="text-xs text-[#8b9ab0]">مستوى {p.level} · {p.points} نقطة</p>
                       </div>
                     </div>
-                    {b.type === "heading" && <Input value={b.text} onChange={(e) => updateBlock(sec.id, b.id, { text: e.target.value })} placeholder="عنوان" />}
-                    {b.type === "text" && <Textarea value={b.text} onChange={(e) => updateBlock(sec.id, b.id, { text: e.target.value })} placeholder="نص" rows={3} />}
-                    {b.type === "image" && (
-                      <>
-                        <ImageUpload value={b.src} onChange={(v) => updateBlock(sec.id, b.id, { src: v })} placeholder="رابط الصورة أو ارفع ملف" />
-                        <Input value={b.alt} onChange={(e) => updateBlock(sec.id, b.id, { alt: e.target.value })} placeholder="وصف الصورة" />
-                      </>
-                    )}
-                    {b.type === "button" && (
-                      <>
-                        <Input value={b.text} onChange={(e) => updateBlock(sec.id, b.id, { text: e.target.value })} placeholder="نص الزر" />
-                        <Input value={b.link} onChange={(e) => updateBlock(sec.id, b.id, { link: e.target.value })} placeholder="الرابط" />
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </Card>
 
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-                <Button size="sm" variant="outline" onClick={() => addBlock(sec.id, "heading")}>+ عنوان</Button>
-                <Button size="sm" variant="outline" onClick={() => addBlock(sec.id, "text")}>+ نص</Button>
-                <Button size="sm" variant="outline" onClick={() => addBlock(sec.id, "image")}>+ صورة</Button>
-                <Button size="sm" variant="outline" onClick={() => addBlock(sec.id, "button")}>+ زر</Button>
+                <Card title="آخر الطلبات" icon={<Package className="w-4 h-4 text-[#f59e0b]" />}>
+                  {loadingDB ? <LoadingRows /> : shopOrders.slice(0, 5).map((o) => (
+                    <div key={o.id} className="flex items-center justify-between py-2 border-b border-[#21262d] last:border-0">
+                      <div>
+                        <p className="text-sm font-medium text-white">{(o.shop_items as any)?.name ?? "—"}</p>
+                        <p className="text-xs text-[#8b9ab0]">{(o.profiles as any)?.display_name ?? "—"}</p>
+                      </div>
+                      <OrderBadge status={o.status} />
+                    </div>
+                  ))}
+                  {!loadingDB && shopOrders.length === 0 && <p className="text-sm text-[#8b9ab0] py-4 text-center">لا توجد طلبات</p>}
+                </Card>
               </div>
             </div>
-          ))}
-        </Section>
+          )}
 
-        <p className="text-center text-xs text-muted-foreground pb-6">التغييرات تُحفظ تلقائياً</p>
-      </div>
-      <Toaster richColors />
-    </div>
-  );
-}
+          {/* ══ SITE INFO ══ */}
+          {activeTab === "site" && (
+            <div className="space-y-5">
+              <PageTitle icon="🌐" title="إعدادات الموقع" subtitle="المعلومات الأساسية والأقسام المخصصة" />
 
-function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <section className="bg-card border border-border rounded-2xl p-5 space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <h2 className="text-lg font-bold">{title}</h2>
-        {action}
-      </div>
-      <div className="space-y-3">{children}</div>
-    </section>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
-}
-
-function labelFor(t: Block["type"]) {
-  return t === "heading" ? "عنوان" : t === "text" ? "نص" : t === "image" ? "صورة" : "زر";
-}
+              <Card title="معلومات أساسية">
+                <div className="space-y-4">
+                  <Field label="اسم الموقع">
+                    <Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} className={inputCls} />
+                  </Field>
+                  <Field label="الوصف">
+                    <Textarea valu
