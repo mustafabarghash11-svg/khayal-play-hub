@@ -273,17 +273,10 @@ function Panel() {
   const activeTabLabel = TABS.find((t) => t.id === activeTab)?.label ?? "";
 
   return (
-    <div
-      dir="rtl"
-      className="min-h-screen bg-[#080c10] text-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(ellipse at 10% 10%, rgba(34,211,238,0.04) 0%, transparent 40%)",
-      }}
-    >
+    <div dir="rtl" className="min-h-screen bg-[#080c10] text-white">
       <Toaster richColors position="top-center" />
 
-      {/* -- Top Bar ------------------------------- */}
+      {/* Top Bar */}
       <header className="sticky top-0 z-50 bg-[#0d1117]/90 backdrop-blur border-b border-[#30363d] px-4 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-[#22d3ee]/20 flex items-center justify-center">
@@ -293,16 +286,11 @@ function Panel() {
           <span className="hidden sm:inline text-[#22d3ee] text-xs font-mono bg-[#22d3ee]/10 px-2 py-0.5 rounded-full">/devk</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[#8b9ab0] hover:text-white h-8 px-3 text-xs"
-            onClick={() => { if (confirm("استرجاع الإعدادات الافتراضية؟")) { setData(defaultData); toast.success("تم الاسترجاع"); } }}
-          >
+          <Button variant="ghost" size="sm" onClick={() => { if (confirm("استرجاع الإعدادات الافتراضية؟")) { setData(defaultData); toast.success("تم الاسترجاع"); } }}>
             <RefreshCw className="w-3 h-3 ml-1" />
             استرجاع
           </Button>
-          <Button asChild variant="ghost" size="sm" className="text-[#8b9ab0] hover:text-white h-8 px-3 text-xs">
+          <Button asChild variant="ghost" size="sm">
             <a href="/" target="_blank" rel="noopener noreferrer">
               <Eye className="w-3 h-3 ml-1" />
               عرض
@@ -312,7 +300,7 @@ function Panel() {
       </header>
 
       <div className="flex">
-        {/* -- Sidebar ------------------------------- */}
+        {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-52 sticky top-14 h-[calc(100vh-3.5rem)] bg-[#0d1117] border-l border-[#30363d] p-3 gap-1 overflow-y-auto shrink-0">
           {TABS.map((tab) => (
             <button
@@ -330,18 +318,14 @@ function Panel() {
               {tab.label}
             </button>
           ))}
-
           <div className="mt-auto pt-4 border-t border-[#30363d]">
             <p className="text-[10px] text-[#8b9ab0] text-center">التغييرات تُحفظ تلقائياً</p>
           </div>
         </aside>
 
-        {/* -- Mobile tab picker ------------------- */}
+        {/* Mobile tab picker */}
         <div className="md:hidden sticky top-14 z-40 bg-[#0d1117] border-b border-[#30363d] w-full px-4 py-2">
-          <button
-            className="flex items-center justify-between w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+          <button className="flex items-center justify-between w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             <span className="flex items-center gap-2 text-[#22d3ee] font-medium">
               {TABS.find((t) => t.id === activeTab)?.icon}
               {activeTabLabel}
@@ -365,73 +349,68 @@ function Panel() {
           )}
         </div>
 
-        {/* -- Main content -------------------------- */}
+        {/* Main content */}
         <main className="flex-1 min-w-0 p-4 md:p-6 space-y-6 max-w-4xl">
-
-          {/* == OVERVIEW == */}
+          {/* Overview Tab */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              <PageTitle icon="📊" title="نظرة عامة" subtitle="إحصائيات سريعة عن الموقع" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <StatCard icon={<Gamepad2 className="w-5 h-5" />} label="الألعاب" value={data.games.length} color="#22d3ee" />
-                <StatCard icon={<Users className="w-5 h-5" />} label="الأعضاء" value={profiles.length} color="#10b981" loading={loadingDB} />
-                <StatCard icon={<ShoppingBag className="w-5 h-5" />} label="منتجات المتجر" value={shopItems.length} color="#f59e0b" loading={loadingDB} />
-                <StatCard icon={<Package className="w-5 h-5" />} label="الطلبات" value={shopOrders.length} color="#8b5cf6" loading={loadingDB} />
+              <div className="flex items-center gap-2 text-2xl font-black">
+                <span className="text-3xl">📊</span>
+                <span className="text-white">نظرة عامة</span>
               </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <Card title="آخر الأعضاء" icon={<Users className="w-4 h-4 text-[#10b981]" />}>
-                  {loadingDB ? <LoadingRows /> : profiles.slice(0, 5).map((p) => (
-                    <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[#21262d] last:border-0">
-                      <div className="w-8 h-8 rounded-full bg-[#22d3ee]/20 flex items-center justify-center text-sm font-bold text-[#22d3ee]">
-                        {p.display_name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{p.display_name}</p>
-                        <p className="text-xs text-[#8b9ab0]">مستوى {p.level} · {p.points} نقطة</p>
-                      </div>
-                    </div>
-                  ))}
-                </Card>
-
-                <Card title="آخر الطلبات" icon={<Package className="w-4 h-4 text-[#f59e0b]" />}>
-                  {loadingDB ? <LoadingRows /> : shopOrders.slice(0, 5).map((o) => (
-                    <div key={o.id} className="flex items-center justify-between py-2 border-b border-[#21262d] last:border-0">
-                      <div>
-                        <p className="text-sm font-medium text-white">{(o.shop_items as any)?.name ?? "—"}</p>
-                        <p className="text-xs text-[#8b9ab0]">{(o.profiles as any)?.display_name ?? "—"}</p>
-                      </div>
-                      <OrderBadge status={o.status} />
-                    </div>
-                  ))}
-                  {!loadingDB && shopOrders.length === 0 && <p className="text-sm text-[#8b9ab0] py-4 text-center">لا توجد طلبات</p>}
-                </Card>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#22d3ee]/20 text-[#22d3ee]"><Gamepad2 className="w-5 h-5" /></div>
+                    <div><p className="text-xs text-[#8b9ab0]">الألعاب</p><p className="text-2xl font-black text-white">{data.games.length}</p></div>
+                  </div>
+                </div>
+                <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#10b981]/20 text-[#10b981]"><Users className="w-5 h-5" /></div>
+                    <div><p className="text-xs text-[#8b9ab0]">الأعضاء</p><p className="text-2xl font-black text-white">{loadingDB ? "..." : profiles.length}</p></div>
+                  </div>
+                </div>
+                <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#f59e0b]/20 text-[#f59e0b]"><ShoppingBag className="w-5 h-5" /></div>
+                    <div><p className="text-xs text-[#8b9ab0]">منتجات المتجر</p><p className="text-2xl font-black text-white">{loadingDB ? "..." : shopItems.length}</p></div>
+                  </div>
+                </div>
+                <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#8b5cf6]/20 text-[#8b5cf6]"><Package className="w-5 h-5" /></div>
+                    <div><p className="text-xs text-[#8b9ab0]">الطلبات</p><p className="text-2xl font-black text-white">{loadingDB ? "..." : shopOrders.length}</p></div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* == SITE INFO == */}
+          {/* Site Tab */}
           {activeTab === "site" && (
             <div className="space-y-5">
-              <PageTitle icon="🌐" title="إعدادات الموقع" subtitle="المعلومات الأساسية والأقسام المخصصة" />
-
-              <Card title="معلومات أساسية">
-                <div className="space-y-4">
-                  <Field label="اسم الموقع">
-                    <Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} className={inputCls} />
-                  </Field>
+              <div className="flex items-center gap-2 text-2xl font-black">
+                <span className="text-3xl">🌐</span>
+                <span className="text-white">إعدادات الموقع</span>
+              </div>
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#30363d] bg-[#161b22]/50">
+                  <h3 className="font-bold text-white text-sm">معلومات أساسية</h3>
                 </div>
-              </Card>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-white mb-2 block">اسم الموقع</Label>
+                    <Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} className="bg-[#161b22] border-[#30363d] text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-                       {/* باقي التبويبات (games, community, accounts, points, shop) */}
+          {/* Other Tabs */}
           {activeTab !== "overview" && activeTab !== "site" && (
             <div className="text-center text-[#8b9ab0] py-20">
               تبويب "{activeTabLabel}" قيد التطوير
             </div>
-          )}
-
-        </main>
-      </div>
-    </div>
-  );
-          }
+    
