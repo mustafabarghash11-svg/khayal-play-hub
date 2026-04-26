@@ -9,11 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StreamersRouteImport } from './routes/streamers'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as GamesRouteImport } from './routes/games'
 import { Route as DevkRouteImport } from './routes/devk'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 
+const StreamersRoute = StreamersRouteImport.update({
+  id: '/streamers',
+  path: '/streamers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HallOfFameRoute = HallOfFameRouteImport.update({
+  id: '/hall-of-fame',
+  path: '/hall-of-fame',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesRoute = GamesRouteImport.update({
   id: '/games',
   path: '/games',
@@ -39,12 +57,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
+  '/hall-of-fame': typeof HallOfFameRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/streamers': typeof StreamersRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
+  '/hall-of-fame': typeof HallOfFameRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/streamers': typeof StreamersRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRoutesById {
@@ -52,25 +76,74 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/devk': typeof DevkRoute
   '/games': typeof GamesRoute
+  '/hall-of-fame': typeof HallOfFameRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/streamers': typeof StreamersRoute
   '/s/$slug': typeof SSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/devk' | '/games' | '/s/$slug'
+  fullPaths:
+    | '/'
+    | '/devk'
+    | '/games'
+    | '/hall-of-fame'
+    | '/leaderboard'
+    | '/streamers'
+    | '/s/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/devk' | '/games' | '/s/$slug'
-  id: '__root__' | '/' | '/devk' | '/games' | '/s/$slug'
+  to:
+    | '/'
+    | '/devk'
+    | '/games'
+    | '/hall-of-fame'
+    | '/leaderboard'
+    | '/streamers'
+    | '/s/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/devk'
+    | '/games'
+    | '/hall-of-fame'
+    | '/leaderboard'
+    | '/streamers'
+    | '/s/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevkRoute: typeof DevkRoute
   GamesRoute: typeof GamesRoute
+  HallOfFameRoute: typeof HallOfFameRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  StreamersRoute: typeof StreamersRoute
   SSlugRoute: typeof SSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/streamers': {
+      id: '/streamers'
+      path: '/streamers'
+      fullPath: '/streamers'
+      preLoaderRoute: typeof StreamersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hall-of-fame': {
+      id: '/hall-of-fame'
+      path: '/hall-of-fame'
+      fullPath: '/hall-of-fame'
+      preLoaderRoute: typeof HallOfFameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games': {
       id: '/games'
       path: '/games'
@@ -106,8 +179,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevkRoute: DevkRoute,
   GamesRoute: GamesRoute,
+  HallOfFameRoute: HallOfFameRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  StreamersRoute: StreamersRoute,
   SSlugRoute: SSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

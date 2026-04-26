@@ -40,6 +40,9 @@ export function SideNav() {
         <nav className="p-5 space-y-1">
           <NavLink to="/" onClick={() => setOpen(false)}>الصفحة الرئيسية</NavLink>
           <NavLink to="/games" onClick={() => setOpen(false)}>الألعاب</NavLink>
+          <NavLink to="/streamers" onClick={() => setOpen(false)}>المبدعون</NavLink>
+          <NavLink to="/leaderboard" onClick={() => setOpen(false)}>أفضل اللاعبين</NavLink>
+          <NavLink to="/hall-of-fame" onClick={() => setOpen(false)}>قاعة الأبطال</NavLink>
 
           {data.customSections.length > 0 && (
             <div className="pt-3 mt-3 border-t border-border">
@@ -72,7 +75,7 @@ export function SideNav() {
   );
 }
 
-function NavLink({ to, onClick, children }: { to: "/" | "/games"; onClick: () => void; children: React.ReactNode }) {
+function NavLink({ to, onClick, children }: { to: "/" | "/games" | "/streamers" | "/leaderboard" | "/hall-of-fame"; onClick: () => void; children: React.ReactNode }) {
   return (
     <Link
       to={to}
